@@ -1,28 +1,50 @@
-REMIX DEFAULT WORKSPACE
+THE AUCTION SMART CONTRACT
 
-Remix default workspace is present when:
-i. Remix loads for the very first time 
-ii. A new workspace is created with 'Default' template
-iii. There are no files existing in the File Explorer
+This code defines a smart contract for an auction with features for placing bids, canceling, and finalizing the auction.
 
-This workspace contains 3 directories:
+Here's a breakdown of the functionalities:
 
-1. 'contracts': Holds three contracts with increasing levels of complexity.
-2. 'scripts': Contains four typescript files to deploy a contract. It is explained below.
-3. 'tests': Contains one Solidity test file for 'Ballot' contract & one JS test file for 'Storage' contract.
+1. Auction Setup:
 
-SCRIPTS
+Tracks the owner's address (owner).
+Defines the starting and ending block numbers (startBlock and endBlock) for the auction duration.
+Stores a reference hash (ipfsHash) to the auction details likely stored on IPFS (a decentralized storage network).
+Sets the initial auction state (auctionState) to "Running".
+Initializes variables for highest binding bid (highestBindingBid), highest bidder (highestBidder), and bid increment (bidIncrement).
+A boolean ownerFinalized tracks if the owner has claimed the funds.
 
-The 'scripts' folder has four typescript files which help to deploy the 'Storage' contract using 'web3.js' and 'ethers.js' libraries.
+2. State Management:
 
-For the deployment of any other contract, just update the contract's name from 'Storage' to the desired contract and provide constructor arguments accordingly 
-in the file `deploy_with_ethers.ts` or  `deploy_with_web3.ts`
+Defines an enum called State with possible values: "Started", "Running", "Ended", and "Canceled".
+Ensures actions are performed only in the appropriate state using modifiers.
 
-In the 'tests' folder there is a script containing Mocha-Chai unit tests for 'Storage' contract.
+3. Placing Bids:
 
-To run a script, right click on file name in the file explorer and click 'Run'. Remember, Solidity file must already be compiled.
-Output from script will appear in remix terminal.
+The placeBid function allows users to submit bids.
+Requires the auction to be running (afterStart and beforeEnd modifiers).
+Enforces a minimum bid amount (commented out in this example).
+Calculates the current bid for the user (including the sent amount).
+Updates the highest binding bid considering the current bid and existing bids.
+Tracks the highest bidder and their bid amount.
+Returns a boolean indicating a successful bid placement.
 
-Please note, require/import is supported in a limited manner for Remix supported modules.
-For now, modules supported by Remix are ethers, web3, swarmgw, chai, multihashes, remix and hardhat only for hardhat.ethers object/plugin.
-For unsupported modules, an error like this will be thrown: '<module_name> module require is not supported by Remix IDE' will be shown.
+4. Canceling Auction:
+
+The cancelAuction function allows the owner to cancel the auction before it ends (onlyOwner and beforeEnd modifiers).
+Changes the auction state to "Canceled".
+
+5. Finalizing Auction:
+
+The finalizeAuction function handles finalizing the auction and distributing funds.
+Requires the auction to be either canceled or ended (require statement).
+Allows the owner or any bidder with a bid to call this function.
+Determines the recipient and value based on the auction state and caller:
+Canceled auction: Refunds the sender's bid.
+Ended auction (not canceled):
+If the owner finalizes for the first time (ownerFinalized check), they receive the highest binding bid.
+Otherwise, the highest bidder receives their bid minus the highest binding bid, or a bidder receives their full bid back if they are not the highest bidder.
+Resets the recipient's bid amount to avoid multiple payouts.
+Transfers the funds to the recipient.
+Overall, this smart contract provides a secure and automated way to conduct auctions on the blockchain. It ensures transparency in bidding and fair distribution of funds after the auction concludes.
+
+
