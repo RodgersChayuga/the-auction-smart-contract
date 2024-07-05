@@ -40,11 +40,13 @@ Requires the auction to be either canceled or ended (require statement).
 Allows the owner or any bidder with a bid to call this function.
 Determines the recipient and value based on the auction state and caller:
 Canceled auction: Refunds the sender's bid.
+
 Ended auction (not canceled):
 If the owner finalizes for the first time (ownerFinalized check), they receive the highest binding bid.
 Otherwise, the highest bidder receives their bid minus the highest binding bid, or a bidder receives their full bid back if they are not the highest bidder.
 Resets the recipient's bid amount to avoid multiple payouts.
 Transfers the funds to the recipient.
+
 Overall, this smart contract provides a secure and automated way to conduct auctions on the blockchain. It ensures transparency in bidding and fair distribution of funds after the auction concludes.
 
 
